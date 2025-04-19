@@ -1,0 +1,30 @@
+name: Docker Image CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "The warp version you want to build"
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Docker build
+        run: |
+          VERSION=${{ github.event.inputs.version }}
+          docker buildx build --platform linux/arm64 --build-arg VERSION=$VERSION -t ghcr.io/jazzxp/cloudflare-warp-proxy:$VERSION -t ghcr.io/jazzxp/cloudflare-warp-proxy:latest .
+      - name: Login to Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Docker push
+        run: |
+          docker push ghcr.io/jazzxp/cloudflare-warp-proxy:${{ github.event.inputs.version }} && \
+          docker push ghcr.io/jazzxp/cloudflare-warp-proxy:latest
