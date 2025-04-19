@@ -21,7 +21,7 @@ RUN apt update && \
   curl -OL https://github.com/tinyproxy/tinyproxy/releases/download/1.11.2/tinyproxy-1.11.2.tar.gz && \
   tar zvxf tinyproxy-1.11.2.tar.gz
 RUN cd tinyproxy-1.11.2 && \
-  ./configure && make && make install && \
+  ./configure --enable-upstream && make && make install && \
   cp src/tinyproxy /
 
 FROM cf AS final
